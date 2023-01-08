@@ -1,0 +1,48 @@
+---
+
+- name: Installing npm and node
+  hosts: target
+  become: true
+  tasks:
+    - name: updating cache
+      apt: update_cache=yes cache_valid_time=3600
+
+    - name: installing packages
+      apt:
+        pkg:
+        - nodejs
+        - npm
+- name: Create new linux user for nodejs
+  hosts: target
+  become: true
+  tasks:
+    - name: create a linux user
+      user:
+        name: "{{name}}"
+        comment: Node Admin
+        group: admin
+
+
+- name: Deploy nodejs app
+  hosts: target
+  become: true
+  become_user: "{{name}}"
+  tasks:
+    - name: copying archive
+      unarchive:
+        src: "{{location}}/nodejs-app-{{version}}.tgz"
+        dest: "{{destination}}"
+
+    - name: Installing dependencies
+      npm:
+        path: "{{destination}}/package"
+    - name: Start the Application
+      command:
+        chdir: "{{destination}}/package/app"
+        cmd: node server
+      async: 1800
+      poll: 0
+    - name: Ensure app is runnig
+      shell: ps aux | grep node
+      register: app_status
+    - debug: msg={{app_status.stdout_lines}}

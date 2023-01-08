@@ -1,0 +1,5 @@
+location: /home/ubuntu/project1/simple-nodejs
+name: king
+version: 1.0.0
+destination: /home/{{name}}
+
