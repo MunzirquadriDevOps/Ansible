@@ -1,0 +1,19 @@
+- name: First Playbook
+  hosts: all
+  become: true
+  tasks:
+  - name: Installing httpd
+    yum:
+      name: httpd
+      state: present
+
+  - name: starting httpd
+    service:
+      name: httpd
+      state: started
+
+  - name: Copying file from local to remote
+    copy:
+      src: ./index.html
+      dest: /var/www/html
+
